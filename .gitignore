@@ -1,0 +1,5 @@
+.idea
+venv
+__pycache__
+secret.py
+vk_config.v2.json
