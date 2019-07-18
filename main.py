@@ -5,12 +5,22 @@ import secret
 
 def friends_list(user):
     request = requests.get(
-        f'https://api.vk.com/method/friends.get?user_id={user}&&name_case=acc&v=5.101&access_token={secret.token}')
+        f'https://api.vk.com/method/friends.get?user_id={user}&v=5.101&access_token={secret.token}')
     friends = json.loads(request.text)
     try:
         return friends['response']['items']
     except:
         return []
+
+
+def get_user(user):
+    request = requests.get(
+        f'https://api.vk.com/method/users.get?user_ids={user}&&name_case=acc&v=5.101&access_token={secret.token}')
+    user_info = json.loads(request.text)
+    try:
+        return user_info['response'][0]
+    except:
+        return 'error'
 
 
 def bfs(start, goal):
@@ -32,22 +42,11 @@ def shortest_path(start, goal):
         return None
 
 
-id1 = 211709668
-id2 = 83645740
-print(shortest_path(id1, id2))
+user1 = input()
+user2 = input()
 
-
-# def bfs(start, goal):
-#     queue, used = [], []
-#     path = {}
-#     used.append(start)
-#     queue.append(start)
-#     while queue:
-#         u = queue.pop(0)
-#         for friend in friends_list(u):
-#             if friend == goal:
-#                 return path
-#             if friend not in used:
-#                 used.append(friend)
-#                 queue.append(friend)
-#                 path[friend] = u
+path = shortest_path(get_user(user1)['id'], get_user(user2)['id'])[1:-1]
+print('Вы знакомы через: ')
+for id in path:
+    id = int(id)
+    print(f'{get_user(id)["first_name"]} {get_user(id)["last_name"]}')
