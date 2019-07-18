@@ -1,11 +1,16 @@
+import requests
+import json
 import secret
-import vk_api
 
 
 def friends_list(user):
-    tools = vk_api.VkTools(vk_session)
-    friends = tools.get_all('friends.get', 1, {'user_id': user, 'name_case': 'acc'})
-    return friends['items']
+    request = requests.get(
+        f'https://api.vk.com/method/friends.get?user_id={user}&&name_case=acc&v=5.101&access_token={secret.token}')
+    friends = json.loads(request.text)
+    try:
+        return friends['response']['items']
+    except:
+        return []
 
 
 def bfs(start, goal):
@@ -13,7 +18,6 @@ def bfs(start, goal):
     while queue:
         (vertex, path) = queue.pop(0)
         for next in friends_list(vertex):
-            print(next)
             if next not in set(path):
                 if next == goal:
                     yield path + [next]
@@ -27,22 +31,23 @@ def shortest_path(start, goal):
     except StopIteration:
         return None
 
-# def bfs(start):
-#     used, queue = set(), [start]
-#     while queue:
-#         u = queue.pop(0)
-#         if u not in used:
-#             used.add(u)
-#             queue.extend(friends_list(u) - used)
-
-
-vk_session = vk_api.VkApi(secret.login, secret.password)
-
-try:
-    vk_session.auth(token_only=True)
-except vk_api.AuthError as error_msg:
-    print(error_msg)
 
 id1 = 211709668
 id2 = 83645740
 print(shortest_path(id1, id2))
+
+
+# def bfs(start, goal):
+#     queue, used = [], []
+#     path = {}
+#     used.append(start)
+#     queue.append(start)
+#     while queue:
+#         u = queue.pop(0)
+#         for friend in friends_list(u):
+#             if friend == goal:
+#                 return path
+#             if friend not in used:
+#                 used.append(friend)
+#                 queue.append(friend)
+#                 path[friend] = u
